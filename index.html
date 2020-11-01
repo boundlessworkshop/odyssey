@@ -1,0 +1,255 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Can You Escape</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/app.css">
+    <script src="./js/bootstrap.min.js"></script>
+    
+</head>
+
+<body>
+    
+    <video autoplay muted loop id="backgroundVideo">
+        <source src="video/background.mp4" type="video/mp4">
+        </video>
+    
+    <div class="container content">
+
+        <div class="row title">
+            <div class="col-10 offset-1">Odyssey Terminal</div>
+        </div>
+
+        <div class="row">
+            <!-- <h1 class="col-10 offset-1" id="timer"></h1> -->
+            <p class="col-10 offset-1" id="message"></p>
+        </div>
+
+        <div class="row fixed-bottom">
+            <p id="message-preview"></p>
+        </div>
+
+
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/easytimer.min.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+
+    <script>
+        var timer;
+        function reset(str = null) {
+            timer = null;
+            timer = new Timer();
+
+            timer.addEventListener('secondsUpdated', function (e) {
+                $('#timer').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+            });
+            timer.addEventListener('targetAchieved', function (e) {
+                $('#timer').addClass('faded');
+                $('#message').text('BRACE FOR IMPACT');
+                // new Audio('./sounds/end.mp3').play();
+                clearMessage();
+            });
+
+            $('#timer').text( str || '60:00' );
+            setTimeout(function() {
+                $('#timer').text( str || '60:00' );
+            }, 1000);
+        }
+        reset();
+
+        var keys = {
+            start: '1',
+            stop: '2',
+            pause: '3',
+            reset: '4',
+            thirty: '5',
+            fail: '6',
+            welldone: '7',
+            buggy: '8',
+            audio_clip_2: '9',
+            audio_clip_3: '0'
+
+        }
+
+        /*
+         *  Add pre-configured messages here
+         */
+        var clues = {
+            a: 'This is clue one',
+            b: 'This is clue two',
+            c: 'This is clue three',
+            d: 'This is clue four',
+            e: 'This is clue five',
+            f: 'This is clue six',
+            g: 'This is clue seven',
+            h: 'This is clue eight',
+            i: 'This is clue nine',
+            j: 'This is clue ten',
+            k: 'This is clue eleven',
+            l: 'This is clue twelve',
+            m: 'This is clue thirteen',
+            n: 'This is clue fourteen',
+            o: 'This is clue fifteen',
+            p: 'This is clue sixteen',
+            q: 'This is clue seventeen',
+            r: 'This is clue eighteen',
+            s: 'This is clue nineteen',
+            t: 'This is clue twenty',
+        }
+
+        var message = '';
+
+        document.onkeydown = function(e) {
+
+            if (e.key == 'Backspace') {
+                message = message.substr(0, message.length - 1);
+                $('#message-preview').text(message);
+
+            } else if (e.key == 'Enter') {
+                if (match = message.match(/[0-9][0-9]?:[0-9][0-9]?/)) {
+                    var parts = match[0].split(':');
+                    console.log(parts);
+                    console.log('Minutes: '+parts[0]);
+                    console.log('Seconds: '+parts[1]);
+
+                    reset(match);
+                    timer.start({
+                        countdown: true,
+                        startValues: {
+                            seconds: parseInt(parts[1]),
+                            minutes: parseInt(parts[0]),
+                            hours: 0
+                        }
+                    });
+                    message = '';
+                    $('#message-preview').text('');
+
+                } else if (clues[message]) {
+                    message = clues[message];
+                    $('#message-preview').text(message);
+
+                } else if (message == keys.start) {
+                    timer.start({countdown: true, startValues: {seconds: 0,hours: 1}});
+                    // new Audio('./sounds/intro_audio.mp3').play();
+                    clearMessage();
+
+                } else if (message == keys.pause) {
+                    timer.pause();
+                    clearMessage();
+
+                } else if (message == keys.stop) {
+                    timer.stop();
+                    clearMessage();
+
+                } else if (message == keys.reset) {
+                    reset();
+                    clearMessage();
+
+                } else if (message == keys.alice) {
+                    clearMessage();
+                    new Audio('./sounds/intro_audio.mp3').play();
+
+                } else if (message == keys.thirty) {
+                    clearMessage();
+                    new Audio('./sounds/thirty.mp3').play();
+
+                } else if (message == keys.fail) {
+                    clearMessage();
+                    new Audio('./sounds/end.mp3').play();
+
+                }
+                else if (message == keys.welldone) {
+                    clearMessage();
+                    new Audio('./sounds/success.mp3').play();
+
+                }
+                else if (message == keys.buggy) {
+                    clearMessage();
+                    new Audio('./sounds/buggy.mp3').play();
+
+                }
+                else if (message == keys.audio_clue_2) {
+                    clearMessage();
+                    new Audio('./sounds/holding.mp3').play();
+
+                }
+                else if (message == keys.audio_clue_3) {
+                    clearMessage();
+                    new Audio('./sounds/holding.mp3').play();
+
+                }else {
+                    showMessage();
+                }
+
+            } else if (e.key.length == 1) {
+                message += e.key;
+                $('#message-preview').text(message);
+            }
+
+            /*
+             *  Update the preview to explain what's going to happen
+             */
+            if (message == keys.start) {
+                $('#message-preview').text('[ Start ]');
+
+            } else if (message == keys.pause) {
+                $('#message-preview').text('[ Pause ]');
+
+            } else if (message == keys.stop) {
+                $('#message-preview').text('[ Stop ]');
+
+            } else if (message == keys.reset) {
+                $('#message-preview').text('[ Reset ]');
+
+            } else if (match = message.match(/[0-9][0-9]?:[0-9][0-9]?/)) {
+                $('#message-preview').text('[ Set timer to '+match[0]+' ]');
+
+            } else if (message) {
+                $('#message-preview').text('Show message: '+message);
+
+            } else {
+                $('#message-preview').text('');
+            }
+
+        }
+
+        function clearMessage() {
+            message = '';
+            $('#message-preview').text('');
+        }
+
+        function showMessage() {
+            if (!message) {
+                return;
+            }
+
+            new Audio('./sounds/message.mp3').play();
+
+            $('#message-preview').text('');
+            $('#timer').addClass('faded');
+            $('#message').text('');
+
+            for (i = 0; i < message.length; i++) {
+                setTimeout((function(letter) {
+                    $('#message').text( $('#message').text() + letter);
+                })(message.substr(i, 1)), i * 200);
+            }
+
+            setTimeout(function() {
+                $('#timer').removeClass('faded');
+                $('#message').text('');
+            }, 20000);
+
+            message = '';
+        }
+
+    </script>
+</body>
+</html>
